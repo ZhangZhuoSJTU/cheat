@@ -2,6 +2,3 @@
 	defaultBranch = master
 [safe]
 	directory = *
-[user]
-	name = Test User
-	email = test@test.com

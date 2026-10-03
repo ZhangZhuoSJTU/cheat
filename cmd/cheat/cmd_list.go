@@ -14,25 +14,13 @@ import (
 	"github.com/cheat/cheat/internal/config"
 	"github.com/cheat/cheat/internal/display"
 	"github.com/cheat/cheat/internal/sheet"
-	"github.com/cheat/cheat/internal/sheets"
 )
 
 // cmdList lists all available cheatsheets.
 func cmdList(cmd *cobra.Command, args []string, conf config.Config) {
 
-	// load the cheatsheets
-	cheatsheets, err := sheets.Load(conf.Cheatpaths)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to list cheatsheets: %v\n", err)
-		os.Exit(1)
-	}
-	if cmd.Flags().Changed("tag") {
-		tagVal, _ := cmd.Flags().GetString("tag")
-		cheatsheets = sheets.Filter(
-			cheatsheets,
-			strings.Split(tagVal, ","),
-		)
-	}
+	// load the cheatsheets, filtered by tag if --tag was passed
+	cheatsheets := loadSheets(cmd, conf)
 
 	// instead of "consolidating" all of the cheatsheets (ie, overwriting global
 	// sheets with local sheets), here we simply want to create a slice

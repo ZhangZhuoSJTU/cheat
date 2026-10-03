@@ -19,19 +19,8 @@ func cmdView(cmd *cobra.Command, args []string, conf config.Config) {
 
 	colorize, _ := cmd.Flags().GetBool("colorize")
 
-	// load the cheatsheets
-	cheatsheets, err := sheets.Load(conf.Cheatpaths)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to list cheatsheets: %v\n", err)
-		os.Exit(1)
-	}
-	if cmd.Flags().Changed("tag") {
-		tagVal, _ := cmd.Flags().GetString("tag")
-		cheatsheets = sheets.Filter(
-			cheatsheets,
-			strings.Split(tagVal, ","),
-		)
-	}
+	// load the cheatsheets, filtered by tag if --tag was passed
+	cheatsheets := loadSheets(cmd, conf)
 
 	// if --all was passed, display cheatsheets from all cheatpaths
 	allFlag, _ := cmd.Flags().GetBool("all")

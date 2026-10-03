@@ -26,19 +26,8 @@ func cmdEdit(cmd *cobra.Command, _ []string, conf config.Config) {
 		os.Exit(1)
 	}
 
-	// load the cheatsheets
-	cheatsheets, err := sheets.Load(conf.Cheatpaths)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to list cheatsheets: %v\n", err)
-		os.Exit(1)
-	}
-	if cmd.Flags().Changed("tag") {
-		tagVal, _ := cmd.Flags().GetString("tag")
-		cheatsheets = sheets.Filter(
-			cheatsheets,
-			strings.Split(tagVal, ","),
-		)
-	}
+	// load the cheatsheets, filtered by tag if --tag was passed
+	cheatsheets := loadSheets(cmd, conf)
 
 	// consolidate the cheatsheets found on all paths into a single map of
 	// `title` => `sheet` (ie, allow more local cheatsheets to override less
