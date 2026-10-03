@@ -27,11 +27,44 @@ func loadSheets(cmd *cobra.Command, conf config.Config) []map[string]sheet.Sheet
 	// filter the cheatsheets by tag if --tag was passed
 	if cmd.Flags().Changed("tag") {
 		tagVal, _ := cmd.Flags().GetString("tag")
-		cheatsheets = sheets.Filter(
-			cheatsheets,
-			strings.Split(tagVal, ","),
-		)
+		cheatsheets = sheets.Filter(cheatsheets, parseTags(tagVal))
 	}
 
 	return cheatsheets
 }
+
+// parseTags splits a comma-separated --tag value into individual tags. Each
+// tag is trimmed of surrounding whitespace, and an optional leading '#' is
+// stripped so that "#networking" and "networking" are treated identically.
+func parseTags(tagVal string) []string {
+	parts := strings.Split(tagVal, ",")
+	tags := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		p = stripTagPrefix(p)
+		tags = append(tags, p)
+	}
+	return tags
+}
+
+// stripTagPrefix removes a leading '#' from a tag. Tags prefixed with "##"
+// (a convention for sub-category tags) have both hashes stripped.
+func stripTagPrefix(tag string) string {
+	if len(tag) > 0 && tag[0] == '#' {
+		tag = tag[1:]
+		if tag[0] == '#' {
+			tag = tag[1:]
+		}
+	}
+	return tag
+}
+
+// searchPattern builds a regex pattern for the search and list commands. When
+// useRegex is false the phrase is wrapped in "(?i)" for case-insensitive
+// matching; when true the raw phrase is returned unaltered so the caller can
+// supply their own flags.
+func searchPattern(phrase string, useRegex bool) string {
+	if useRegex {
+		return phrase
+	}
+	return "(?i)" + phrase

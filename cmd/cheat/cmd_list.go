@@ -43,10 +43,8 @@ func cmdList(cmd *cobra.Command, args []string, conf config.Config) {
 		// initialize a slice of filtered sheets
 		filtered := []sheet.Sheet{}
 
-		// initialize our filter pattern
-		pattern := "(?i)" + args[0]
-
 		// compile the regex
+		pattern := searchPattern(args[0], false)
 		reg, err := regexp.Compile(pattern)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to compile regexp: %s, %v\n", pattern, err)

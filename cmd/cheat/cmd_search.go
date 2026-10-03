@@ -23,15 +23,8 @@ func cmdSearch(cmd *cobra.Command, args []string, conf config.Config) {
 	// load the cheatsheets, filtered by tag if --tag was passed
 	cheatsheets := loadSheets(cmd, conf)
 
-	// prepare the search pattern
-	pattern := "(?i)" + phrase
-
-	// unless --regex is provided, in which case we pass the regex unaltered
-	if useRegex {
-		pattern = phrase
-	}
-
-	// compile the regex once, outside the loop
+	// compile the search regex once, outside the loop
+	pattern := searchPattern(phrase, useRegex)
 	reg, err := regexp.Compile(pattern)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to compile regexp: %s, %v\n", pattern, err)
