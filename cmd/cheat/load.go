@@ -68,3 +68,4 @@ func searchPattern(phrase string, useRegex bool) string {
 		return phrase
 	}
 	return "(?i)" + phrase
+}
